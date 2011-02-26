@@ -175,10 +175,10 @@ module EventCalendar
             end
             cal << %(</tr></tbody></table>)
           end            
-          
           # calendar row
           cal << %(<table class="ec-row-table" cellpadding="0" cellspacing="0">)
           cal << %(<tbody>)
+          
           
           # day numbers row
           cal << %(<tr>)
@@ -190,6 +190,8 @@ module EventCalendar
             cal << %(" style="height: #{options[:day_nums_height]}px;">)
             if options[:link_to_day_action]
               cal << day_link(day.day, day, options[:link_to_day_action])
+            elsif !options[:display_day_details] && day > first && day < last && block_given?
+              cal << block.call({:day => day})
             else
               cal << %(#{day.day})
             end
