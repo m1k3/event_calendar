@@ -120,7 +120,11 @@ module EventCalendar
           colspan = 7
         end
         (0...options[:number_of_calendars]).each do |calendar_index|
-          options[:month_name_text] = "#{I18n.translate(:'date.month_names')[options[:month]+calendar_index]} #{options[:year]}"
+          year = options[:year]
+          month = options[:month] + calendar_index
+          year -= 1 and month = 12 if month < 1
+          year += 1 and month = 1 if month > 12
+          options[:month_name_text] = "#{I18n.translate(:'date.month_names')[month]} #{year}"
           cal << %(<th colspan="#{colspan}" class="ec-month-name">#{options[:month_name_text]}</th>) if options[:month_name_text]
         end
         cal << %(<th colspan="2" class="ec-month-nav ec-next-month">#{options[:next_month_text]}</th>) if options[:next_month_text]
@@ -134,8 +138,12 @@ module EventCalendar
           first = options[:dates].begin
           last = options[:dates].end
         else
-          first = Date.civil(options[:year], options[:month]+calendar_index, 1)
-          last = Date.civil(options[:year], options[:month]+calendar_index, -1)
+          year = options[:year]
+          month = options[:month] + calendar_index
+          year -= 1 and month = 12 if month < 1
+          year += 1 and month = 1 if month > 12
+          first = Date.civil(year, month, 1)
+          last = Date.civil(year, month, -1)
         end
         # body container (holds day names and the calendar rows)
         cal << %(<div class="ec-body" style="height: #{height}px;">)
@@ -162,7 +170,7 @@ module EventCalendar
         # go through a week at a time, until we reach the end of the month
         while(last_day_of_week <= last_day_of_cal)
           cal << %(<div class="ec-row" style="top: #{top}px; height: #{row_heights[row_num]}px;">)
-          top += row_heights[row_num]
+          top += row_heights[row_num] || 0
 
           # this weeks background table
           if options[:display_day_details]
